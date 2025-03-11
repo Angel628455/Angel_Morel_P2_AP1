@@ -1,11 +1,20 @@
 using Angel_Morel_P2_AP1.Components;
+using Angel_Morel_P2_AP1.DAL;
+using Angel_Morel_P2_AP1.Service;
+using Angel_Morel_P2_AP1.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-var ConStr = builder.Configuration.GetConnectionString("Sqlserver");
+var ConStr = builder.Configuration.GetConnectionString("ConStr");
+builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlServer(ConStr));
+
+builder.Services.AddBlazorBootstrap();
+builder.Services.AddScoped<EncuestaServices>();
+builder.Services.AddScoped<CiudadesServices>();
 
 var app = builder.Build();
 
