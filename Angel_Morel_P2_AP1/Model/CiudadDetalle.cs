@@ -11,6 +11,8 @@ namespace Angel_Morel_P2_AP1.Model
         public decimal Monto { get; set; }
 
         public int NombreId { get; set; }
+        public Ciudades Ciudades { get; set; }
+
 
         public int AsignaturaId { get; set; }
 
