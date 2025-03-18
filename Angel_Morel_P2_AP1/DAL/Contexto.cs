@@ -1,7 +1,7 @@
-﻿
+﻿global using Microsoft.EntityFrameworkCore;
 using Angel_Morel_P2_AP1.Model;
 using Angel_Morel_P2_AP1.Models;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace Angel_Morel_P2_AP1.DAL;
 
@@ -19,7 +19,7 @@ public class Contexto(DbContextOptions<Contexto> options) : DbContext(options)
             new()
             {
                 CiudadId = 1,
-                Nombre = "Nagua",
+                Nombre = "Nagua",                                                                    
                 Monto = 0,
 
             },
