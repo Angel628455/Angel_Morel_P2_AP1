@@ -1,4 +1,6 @@
 ﻿namespace Angel_Morel_P2_AP1.Model;
+
+using Angel_Morel_P2_AP1.Models;
 using System.ComponentModel.DataAnnotations;
 
 public class Encuestas
