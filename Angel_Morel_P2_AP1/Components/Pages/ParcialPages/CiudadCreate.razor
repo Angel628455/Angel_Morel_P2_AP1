@@ -1,10 +1,10 @@
 ﻿@page "/Encuesta/Create"
 @using Angel_Morel_P2_AP1.Model
 @using Angel_Morel_P2_AP1.Models
-@using Angel_Morel_P2_AP1.Service
+@using Angel_Morel_P2_AP1.Services
 @using Angel_Morel_P2_AP1.Services
 @inject EncuestaServices EncuestaServices
-@inject CiudadesServices CiudadeServices
+@inject CiudadServices CiudadeServices
 @inject NavigationManager NavigationManager
 
 <PageTitle>Crear Encuesta</PageTitle>
@@ -56,8 +56,8 @@
                             @foreach (var detalle in Encuesta.EncuestaDetalles)
                             {
                                 <tr>
-                                    <td>@detalle.Ciudad?.Nombre</td>
-                                    <td>@detalle.MontoEncuesta</td>
+                                    <td>@detalle.Ciudades?.Nombre</td>
+                                    <td>@detalle.Monto</td>
                                     <td>
                                         <button type="button" class="btn btn-outline-danger bi bi-trash"
                                                 @onclick="() => RemoverDetalle(detalle)">
@@ -73,7 +73,7 @@
                     <div class="col-6 offset-6">
                         <label class="form-label"><strong>Monto Total</strong></label>
                         <label class="form-control text-end">
-                            <strong>@(Encuesta.EncuestaDetalles?.Sum(d => d.MontoEncuesta) ?? 0)</strong>
+                            <strong>@(Encuesta.EncuestaDetalles?.Sum(d => d.Monto) ?? 0)</strong>
                         </label>
                     </div>
                 </div>
@@ -147,8 +147,8 @@
         var detalle = new EncuestaDestalles
         {
             CiudadId = selection.ciudad.CiudadId,
-            Ciudad = selection.ciudad,
-            MontoEncuesta = selection.monto
+            Ciudades = selection.ciudad,
+            Monto = selection.monto
         };
 
         Encuesta.EncuestaDetalles.Add(detalle);
