@@ -1,12 +1,16 @@
-﻿using Angel_Morel_P2_AP1.DAL;
-using Angel_Morel_P2_AP1.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Angel_Morel_P2_AP1.Model;
 using System.Linq.Expressions;
 
-namespace Angel_Morel_P2_AP1.Services;
-
-public class EncuestaServices(IDbContextFactory<Contexto> DbFactory)
+public class EncuestaServices
 {
+    private readonly IDbContextFactory<Contexto> DbFactory;
+
+    // Constructor de la clase, corregido
+    public EncuestaServices(IDbContextFactory<Contexto> dbFactory)
+    {
+        DbFactory = dbFactory;
+    }
+
     public async Task<bool> Existe(int id)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
@@ -16,16 +20,13 @@ public class EncuestaServices(IDbContextFactory<Contexto> DbFactory)
     private async Task<bool> Insertar(Encuestas encuesta)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-
-        // Agregar la encuesta
         contexto.Encuestas.Add(encuesta);
 
-        // Asegurarse de que las ciudades no se inserten, solo se referencien
         foreach (var detalle in encuesta.EncuestaDetalles)
         {
-            if (detalle.Ciudad != null && detalle.Ciudad.CiudadesId > 0)
+            if (detalle.Ciudades != null && detalle.Ciudades.CiudadId > 0)
             {
-                contexto.Entry(detalle.Ciudad).State = EntityState.Unchanged;
+                contexto.Entry(detalle.Ciudades).State = EntityState.Unchanged;
             }
             else if (detalle.CiudadId <= 0)
             {
@@ -39,32 +40,27 @@ public class EncuestaServices(IDbContextFactory<Contexto> DbFactory)
     private async Task<bool> Modificar(Encuestas encuesta)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-
-        // Actualizar la encuesta
         contexto.Entry(encuesta).State = EntityState.Modified;
 
-        // Manejar los detalles
         foreach (var detalle in encuesta.EncuestaDetalles)
         {
-            if (detalle.DestallesId == 0) // Nuevo detalle
+            if (detalle.DetallesId == 0)
             {
                 contexto.Entry(detalle).State = EntityState.Added;
             }
-            else // Detalle existente
+            else
             {
                 contexto.Entry(detalle).State = EntityState.Modified;
             }
 
-            // Verificar que CiudadId sea válido
             if (detalle.CiudadId <= 0)
             {
                 throw new InvalidOperationException($"El CiudadId {detalle.CiudadId} no es válido para el detalle.");
             }
 
-            // Si hay una propiedad Ciudad, marcarla como no modificada
-            if (detalle.Ciudad != null && detalle.Ciudad.CiudadesId > 0)
+            if (detalle.Ciudades != null && detalle.Ciudades.CiudadId > 0)
             {
-                contexto.Entry(detalle.Ciudad).State = EntityState.Unchanged;
+                contexto.Entry(detalle.Ciudades).State = EntityState.Unchanged;
             }
         }
 
