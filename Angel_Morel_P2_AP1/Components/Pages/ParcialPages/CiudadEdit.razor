@@ -1,8 +1,9 @@
 ﻿@page "/Encuesta/Index"
-@using Angel_Morel_P2_AP1.Service
+@using Angel_Morel_P2_AP1.Model
+@using Angel_Morel_P2_AP1.Services
 @rendermode InteractiveServer
 @inject EncuestaServices ServicioEncuestas
-@inject CiudadesServices ServicioCiudades
+@inject CiudadServices ServicioCiudades
 @inject NavigationManager Navegador
 
 <PageTitle>Encuesta</PageTitle>
@@ -99,7 +100,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Encuestas = await EncuestaServices.Listar(t => true);
+        Encuestas = await ServicioEncuestas.Listar(t => true);
     }
 
     private async Task Buscar()
@@ -108,22 +109,22 @@
         {
             if (filtro == "id" && int.TryParse(valorFiltro, out int encuestaId))
             {
-                Encuestas = await EncuestaServices.Listar(i => i.EncuestasId == encuestaId);
+                Encuestas = await ServicioEncuestas.Listar(i => i.EncuestasId == encuestaId);
             }
             else if (filtro == "Fecha" && Desde.HasValue && Hasta.HasValue)
             {
-                Encuestas = await EncuestaServices.Listar(i => i.Fecha >= Desde.Value && i.Fecha <= Hasta.Value);
+                Encuestas = await ServicioEncuestas.Listar(i => i.Fecha >= Desde.Value && i.Fecha <= Hasta.Value);
             }
         }
         else
         {
-            Encuestas = await EncuestaServices.Listar(p => true);
+            Encuestas = await ServicioEncuestas.Listar(p => true);
         }
     }
 
     private async Task Restablecer()
     {
-        Encuestas = await EncuestaServices.Listar(p => true);
+        Encuestas = await ServicioEncuestas.Listar(p => true);
         filtro = "";
         valorFiltro = "";
         Desde = null;
