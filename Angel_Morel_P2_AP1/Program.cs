@@ -1,28 +1,46 @@
-using Angel_Morel_P2_AP1.Components;
+global using BootstrapBlazor;
+global using Angel_Morel_P2_AP1.Components;
+global using Angel_Morel_P2_AP1.DAL;
+global using Microsoft.EntityFrameworkCore;
+global using Angel_Morel_P2_AP1.Services;
 
-var builder = WebApplication.CreateBuilder(args);
+
+
+
+var builder = WebApplication.CreateBuilder(args); 
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+var ConStr = builder.Configuration.GetConnectionString("ConStr");
+builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlServer(ConStr));
 
-var app = builder.Build();
+//ilder.Services.AddBlazorBootstrap();
+builder.Services.AddScoped<EncuestaServices>();
+builder.Services.AddScoped<CiudadesServices>();
+
+builder.Services.AddBlazorBootstrap();
+var app= builder.Build();
+
+//UriBuilder.Services.astService[];
+
+
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (!builder.Build().Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    builder.Build().UseExceptionHandler("/Error", createScopeForErrors: true);
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    builder.Build().UseHsts();
 }
 
-app.UseHttpsRedirection();
+builder.Build().UseHttpsRedirection();
 
 
-app.UseAntiforgery();
+builder.Build().UseAntiforgery();
 
-app.MapStaticAssets();
-app.MapRazorComponents<App>()
+builder.Build().MapStaticAssets();
+builder.Build().MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
-app.Run();
+builder.Build().Run();

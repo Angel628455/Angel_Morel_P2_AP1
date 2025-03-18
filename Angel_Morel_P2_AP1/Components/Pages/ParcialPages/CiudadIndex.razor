@@ -1,0 +1,134 @@
+﻿@page "/Encuesta/Index"
+@using Angel_Morel_P2_AP1.Model
+@using Angel_Morel_P2_AP1.Services
+@rendermode InteractiveServer
+@inject EncuestaServices ServicioEncuestas       
+@inject CiudadServices   ServicioCiudades
+@inject NavigationManager Navegador
+
+<PageTitle>Encuesta</PageTitle>
+
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title m-0">Registro Encuesta</h5>
+            <a href="/Encuesta/Create" class="btn btn-primary">
+                <span class="bi bi-plus-square"></span> Crear
+            </a>
+        </div>
+
+        <div class="card-body">
+            @* Labels *@
+            <div class="row">
+                <div class="col-3"><label class="col-form-label"><strong>Filtrar por</strong></label></div>
+                <div class="col-4"><label class="col-form-label"><strong>Búsqueda</strong></label></div>
+                <div class="col-2"><label class="col-form-label"><strong>Desde</strong></label></div>
+                <div class="col-2"><label class="col-form-label"><strong>Hasta</strong></label></div>
+                <div class="col-1">
+                    <button type="button" class="btn btn-outline-secondary bi bi-arrow-counterclockwise" @onclick="Restablecer"></button>
+                </div>
+            </div>
+
+            @* Inputs y botones *@
+            <div class="row align-items-center">
+                <div class="col-3">
+                    <InputSelect class="form-select" @bind-Value="filtro">
+                        <option value="" selected disabled>Elija una opción</option>
+                        <option value="id">EncuestaId</option>
+                        <option value="Fecha">Fecha</option>
+                    </InputSelect>
+                </div>
+
+                <div class="col-4">
+                    <div class="input-group">
+                        <input class="form-control" @bind="valorFiltro" placeholder="Buscar" />
+                        <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="Buscar"></button>
+                    </div>
+                </div>
+
+                <div class="col-2"><InputDate class="form-control" @bind-Value="Desde"></InputDate></div>
+                <div class="col-2"><InputDate class="form-control" @bind-Value="Hasta"></InputDate></div>
+            </div>
+
+            <table class="table table-hover table-bordered text-center">
+                <thead class="table table-striped text-black">
+                    <tr>
+                        <th>Id</th>
+                        <th>Fecha</th>
+                        <th>Asignatura</th>
+                        <th>Modificar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var encuesta in Encuesta)
+                    {
+                        <tr>
+                            <td>@encuesta.EncuestasId</td>
+                            <td>@encuesta.Fecha.ToString("yyyy-MM-dd")</td>
+                            <td>@encuesta.Asignatura</td>
+                            <td>
+                                <a href="/Encuesta/Edit/@encuesta.EncuestasId" class="btn btn-outline-primary bi bi-pencil-square"></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="card-footer d-flex justify-content-between">
+                <label><strong>Cantidad: @Encuesta.Count()</strong></label>
+                <label><strong>Total: @(Ciudades.Sum(i => i.Monto).ToString("N2"))</strong></label>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<Encuestas> Encuesta = new();
+    private List<Ciudades> Ciudades = new();
+    private string filtro = "";
+    private string valorFiltro = "";
+    private DateTime? Desde { get; set; }
+    private DateTime? Hasta { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarEncuestas();
+    }
+
+    private async Task CargarEncuestas()
+    {
+        Encuesta = await ServicioEncuestas.Listar(t => true) ?? new List<Encuestas>();
+        Ciudades = Encuesta.SelectMany(e => e.EncuestaDetalles.Select(d => d.Ciudades)).ToList();
+    }
+
+    private async Task Buscar()
+    {
+        if (!string.IsNullOrWhiteSpace(valorFiltro) || (Desde.HasValue && Hasta.HasValue))
+        {
+            if (filtro == "id" && int.TryParse(valorFiltro, out int encuestaId))
+            {
+                Encuesta = await ServicioEncuestas.Listar(i => i.EncuestasId == encuestaId);
+            }
+            else if (filtro == "Fecha" && Desde.HasValue && Hasta.HasValue)
+            {
+                Encuesta = await ServicioEncuestas .Listar(i => i.Fecha >= Desde && i.Fecha <= Hasta);
+            }
+        }
+        else
+        {
+            await CargarEncuestas();
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task Restablecer()
+    {
+        await CargarEncuestas();
+        filtro = "";
+        valorFiltro = "";
+        Desde = null;
+        Hasta = null;
+        await InvokeAsync(StateHasChanged);
+    }
+}
