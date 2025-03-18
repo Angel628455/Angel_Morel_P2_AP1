@@ -1,9 +1,9 @@
 ﻿@page "/Encuesta/Index"
-@using Angel_Morel_P2_AP1.Service
-@using static Angel_Morel_P2_AP1.Service.CiudadesServices
+@using Angel_Morel_P2_AP1.Model
+@using Angel_Morel_P2_AP1.Services
 @rendermode InteractiveServer
-@inject EncuestaServices ServicioEncuestas
-@inject CiudadesServices ServicioCiudades
+@inject EncuestaServices ServicioEncuestas       
+@inject CiudadServices   ServicioCiudades
 @inject NavigationManager Navegador
 
 <PageTitle>Encuesta</PageTitle>
@@ -64,7 +64,7 @@
                     {
                         <tr>
                             <td>@encuesta.EncuestasId</td>
-                            <td>@encuesta.Fecha?.ToString("yyyy-MM-dd")</td>
+                            <td>@encuesta.Fecha.ToString("yyyy-MM-dd")</td>
                             <td>@encuesta.Asignatura</td>
                             <td>
                                 <a href="/Encuesta/Edit/@encuesta.EncuestasId" class="btn btn-outline-primary bi bi-pencil-square"></a>
@@ -97,8 +97,8 @@
 
     private async Task CargarEncuestas()
     {
-        Encuesta = await EncuestaServices.Listar(t => true) ?? new List<Encuestas>();
-        Ciudades = Encuesta.SelectMany(e => e.EncuestaDetalles.Select(d => d.Ciudad)).ToList();
+        Encuesta = await ServicioEncuestas.Listar(t => true) ?? new List<Encuestas>();
+        Ciudades = Encuesta.SelectMany(e => e.EncuestaDetalles.Select(d => d.Ciudades)).ToList();
     }
 
     private async Task Buscar()
@@ -107,11 +107,11 @@
         {
             if (filtro == "id" && int.TryParse(valorFiltro, out int encuestaId))
             {
-                Encuesta = await EncuestaServices.Listar(i => i.EncuestasId == encuestaId);
+                Encuesta = await ServicioEncuestas.Listar(i => i.EncuestasId == encuestaId);
             }
             else if (filtro == "Fecha" && Desde.HasValue && Hasta.HasValue)
             {
-                Encuesta = await EncuestaServices.Listar(i => i.Fecha >= Desde && i.Fecha <= Hasta);
+                Encuesta = await ServicioEncuestas .Listar(i => i.Fecha >= Desde && i.Fecha <= Hasta);
             }
         }
         else
